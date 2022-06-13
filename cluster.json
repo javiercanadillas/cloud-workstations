@@ -1,0 +1,4 @@
+{
+  "network": "projects/javiercm-main-dev/global/networks/main",
+  "subnetwork": "projects/javiercm-main-dev/regions/europe-west1/subnetworks/main",
+}
