@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-set -x
+#set -x
 
-GCLOUD_PROJECT_ID=$(gcloud config get-value project)
+GCLOUD_PROJECT_ID=$(gcloud config get-value project 2>/dev/null)
 PROJECT=${GCLOUD_PROJECT_ID:-"javiercm-main-dev"}
 REGION="europe-west1"
 NETWORK="main"
@@ -93,8 +93,8 @@ ssh_to_workstation() {
   echo "ssh user@localhost -p 2222"
 }
 
-# Main function, to be used if bootstrap.sh is not
-main() {
+# Bootstrap workstations, from cluster creation to template
+bootstrap() {
   gen_cluster_config
   create_cluster
   check_cluster
@@ -103,5 +103,21 @@ main() {
   check_workstation
 }
 
-#main "${@}"
-set +x
+help() {
+  echo "Invoke the script using the existing functions as options"
+  echo "Example: ./setup.sh list_workstations"
+  echo ""
+  declare -F | awk '{print $NF}' | sort | grep -E -v "^_"
+}
+
+# Check if the function exists (bash specific)
+if declare -f "$1" > /dev/null; then
+  # call arguments verbatim
+  "$@"
+else
+  # Show a helpful error
+  echo "'$1' is not a known function name" >&2
+  exit 1
+fi
+
+#set +x
