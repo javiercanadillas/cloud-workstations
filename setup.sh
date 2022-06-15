@@ -2,7 +2,7 @@
 set -x
 
 GCLOUD_PROJECT_ID=$(gcloud config get-value project)
-PROJECT=${GCLOUD_PROJECT_ID:-"javiercm-main-dev")
+PROJECT=${GCLOUD_PROJECT_ID:-"javiercm-main-dev"}
 REGION="europe-west1"
 NETWORK="main"
 SUBNETWORK="main"
@@ -74,6 +74,12 @@ create_workstation() {
      -H "Content-Type: application/json" \
      -d @"$WS_CONFIG_FILE" \
     https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstationConfigs?workstation_config_id=${WS_CONFIG_NAME}
+}
+
+list_workstations() {
+   curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    -H "Content-Type: application/json" \
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstations
 }
 
 ssh_to_workstation() {
