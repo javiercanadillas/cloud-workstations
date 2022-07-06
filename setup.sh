@@ -93,6 +93,20 @@ ssh_to_workstation() {
   echo "ssh user@localhost -p 2222"
 }
 
+help() {
+  echo "Invoke the script using the existing functions as options"
+  echo "Example: ./setup.sh list_workstations"
+  echo ""
+  declare -F | awk '{print $NF}' | sort | grep -E -v "^_"
+}
+
+submit_operation() {
+   curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+     -H "Content-Type: application/json" \
+     -d @"$2" \
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstationConfigs?workstation_config_id=${WS_CONFIG_NAME}
+}
+
 # Bootstrap workstations, from cluster creation to template
 bootstrap() {
   gen_cluster_config
@@ -101,13 +115,6 @@ bootstrap() {
   gen_workstation_config
   create_workstation
   check_workstation
-}
-
-help() {
-  echo "Invoke the script using the existing functions as options"
-  echo "Example: ./setup.sh list_workstations"
-  echo ""
-  declare -F | awk '{print $NF}' | sort | grep -E -v "^_"
 }
 
 # Check if the function exists (bash specific)
