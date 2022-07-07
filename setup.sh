@@ -9,7 +9,7 @@ NETWORK="main"
 SUBNETWORK="main"
 CLUSTER_NAME="main-cluster"
 CLUSTER_CONF_FILE="cluster.json"
-WS_CONFIG_FILE="workstation.json"
+WS_CONFIG_FILE="workstation_plus.json"
 WS_CONFIG_NAME="cloudtop-main"
 # This name must match the name used to create your developer workstation in 
 # ssh.cloud.google.com/workstations
@@ -147,7 +147,7 @@ help() {
   echo "Invoke the script using the existing functions as options"
   echo "Example: ./setup.sh list_workstations"
   echo ""
-  declare -F | awk '{print $NF}' | sort | grep -E -v "^_"
+  declare -F | awk '{print $NF}' | grep -E -v "^_"
 }
 
 # Bootstrap workstations, from cluster creation to template
