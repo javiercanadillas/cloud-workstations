@@ -30,17 +30,59 @@ create_cluster() {
     -H "Content-Type: application/json" \
     -d "@${CLUSTER_CONF_FILE}" \
     https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters?workstation_cluster_id=${CLUSTER_NAME}
+
+  while (curl -s -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    -H "Content-Type: application/json" \
+    https://workstations.googleapis.com/v1alpha1/projects/$project/locations/$region/workstationClusters/${CLUSTER_NAME} | grep -q '"done": false')
+  do
+    sleep 120
+  done
 }
 
-# Chack a Workstation Cluster configuration creation status
-check_cluster() {
+# Check a Workstation Cluster configuration creation status
+get_cluster() {
   curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
     -H "Content-Type: application/json" \
     https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}
 }
 
-# Chack a Workstation Cluster configuration creation status
-check_workstation() {
+# List existing clusters
+list_clusters() {
+    curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    -H "Content-Type: application/json" \
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters
+}
+
+# Delete an existing cluster, forcing a cascade delete of depending resources
+delete_cluster() {
+  curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    -H "Content-Type: application/json" \
+    -X "DELETE" \
+    -d '{"force": true}' \
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}
+
+  while (curl -s -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    -H "Content-Type: application/json" \
+    https://workstations.googleapis.com/v1alpha1/projects/$project/locations/$region/workstationClusters/$clusterid | grep -q reconciling)
+  do
+    sleep 120
+  done
+}
+
+get_workstationConfig() {
+  curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    -H "Content-Type: application/json" \
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstationConfigs/${WS_CONFIG_NAME}
+}
+
+list_workstationConfigs() {
+  curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    -H "Content-Type: application/json" \
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstationConfigs
+}
+
+# Check a Workstation Cluster configuration creation status
+get_workstation() {
   curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
     -H "Content-Type: application/json" \
     https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstationConfigs/${WS_CONFIG_NAME}
@@ -93,6 +135,13 @@ ssh_to_workstation() {
   echo "ssh user@localhost -p 2222"
 }
 
+delete_workstation() {
+  curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    -H "Content-Type: application/json" \
+    -X "DELETE" \
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstations/${WS_NAME}
+}
+
 help() {
   echo "Invoke the script using the existing functions as options"
   echo "Example: ./setup.sh list_workstations"
@@ -100,18 +149,11 @@ help() {
   declare -F | awk '{print $NF}' | sort | grep -E -v "^_"
 }
 
-submit_operation() {
-   curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-     -H "Content-Type: application/json" \
-     -d @"$2" \
-    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstationConfigs?workstation_config_id=${WS_CONFIG_NAME}
-}
-
 # Bootstrap workstations, from cluster creation to template
 bootstrap() {
   gen_cluster_config
   create_cluster
-  check_cluster
+  get_cluster
   gen_workstation_config
   create_workstation
   check_workstation
