@@ -14,3 +14,9 @@ If running this for the first time, the function `bootstrap` includes all necess
 ```bash
 ./setup.sh bootstrap
 ```
+
+You can use env vars from the CLI to override default values inside the script. For example:
+
+```bash
+WS_CONFIG_FILE=workstation_goland.json WS_CONFIG_NAME=cloudtop-goland ./setup.sh create_workstation
+```

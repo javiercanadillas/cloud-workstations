@@ -9,11 +9,11 @@ NETWORK="main"
 SUBNETWORK="main"
 CLUSTER_NAME="main-cluster"
 CLUSTER_CONF_FILE="cluster.json"
-WS_CONFIG_FILE="workstation_plus.json"
-WS_CONFIG_NAME="cloudtop-main"
+WS_CONFIG_FILE=${WS_CONFIG_FILE:-"workstation_plus.json"}
+WS_CONFIG_NAME=${WS_CONFIG_NAME:-"cloudtop-main"}
 # This name must match the name used to create your developer workstation in 
 # ssh.cloud.google.com/workstations
-WS_NAME="javiercm-cloudtop"
+WS_NAME=${WS_NAME:-"javiercm-cloudtop"}
 
 # Generate a Workstation Cluster configuration
 gen_cluster_config() {
