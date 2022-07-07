@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #set -x
 
+# SET YOUR VARIABLES HERE
 GCLOUD_PROJECT_ID=$(gcloud config get-value project 2>/dev/null)
 PROJECT=${GCLOUD_PROJECT_ID:-"javiercm-main-dev"}
 REGION="europe-west1"
