@@ -70,25 +70,6 @@ delete_cluster() {
   done
 }
 
-get_workstationConfig() {
-  curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-    -H "Content-Type: application/json" \
-    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstationConfigs/${WS_CONFIG_NAME}
-}
-
-list_workstationConfigs() {
-  curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-    -H "Content-Type: application/json" \
-    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstationConfigs
-}
-
-# Check a Workstation Cluster configuration creation status
-get_workstation() {
-  curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-    -H "Content-Type: application/json" \
-    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstationConfigs/${WS_CONFIG_NAME}
-}
-
 # Generate a Workstation configuration
 gen_workstation_config() {
   cat <<EOF > "${WS_CONFIG_FILE}"
@@ -111,6 +92,18 @@ gen_workstation_config() {
 EOF
 }
 
+get_workstationConfig() {
+  curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    -H "Content-Type: application/json" \
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstationConfigs/${WS_CONFIG_NAME}
+}
+
+list_workstationConfigs() {
+  curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    -H "Content-Type: application/json" \
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstationConfigs
+}
+
 # Create a Workstation configuration
 create_workstation() {
   curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
@@ -125,15 +118,22 @@ list_workstations() {
     https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstations
 }
 
+# Check a Workstation Cluster configuration creation status
+get_workstation() {
+  curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    -H "Content-Type: application/json" \
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER_NAME}/workstationConfigs/${WS_CONFIG_NAME}
+}
+
 ssh_to_workstation() {
-  gcloud alpha workstations start-tcp-tunnel \
-    --project=${PROJECT} \
-    --region=${REGION} \
-    --cluster=${CLUSTER_NAME} \
-    ${WS_NAME} 22 \
-    --local-host-port=:2222
   echo "You can now connect you ${WS_NAME} with the following command:"
   echo "ssh user@localhost -p 2222"
+  gcloud alpha workstations start-tcp-tunnel \
+    --project="${PROJECT}" \
+    --region=${REGION} \
+    --cluster=${CLUSTER_NAME} \
+    "${WS_NAME}" 22 \
+    --local-host-port=:2222
 }
 
 delete_workstation() {
