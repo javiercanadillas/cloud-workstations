@@ -156,7 +156,7 @@ bootstrap() {
   get_cluster
   gen_workstation_config
   create_workstation
-  check_workstation
+  get_workstation
 }
 
 # Check if the function exists (bash specific)
